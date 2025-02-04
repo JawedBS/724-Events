@@ -14,7 +14,6 @@ import { useData } from "../../contexts/DataContext";
 
 const Page = () => {
   const { events } = useData();
-
   // Récupére le dernier événement effectué
   const lastEvent = events
     ?.filter(event => new Date(event.date) <= new Date()) // Filtre les événements passés
