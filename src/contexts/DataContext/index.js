@@ -5,40 +5,60 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
 
 const DataContext = createContext({});
 
 export const api = {
   loadData: async () => {
-    const json = await fetch("/events.json");
-    return json.json();
+    try {
+      const response = await fetch("/events.json");
+
+      if (!response.ok) {
+        throw new Error(`Erreur de chargement ! Statut : ${response.status}`);
+      }
+
+      const jsonData = await response.json();
+      console.log("JSON récupéré :", jsonData); // Debugging
+      return jsonData;
+    } catch (error) {
+      console.error("Erreur lors du chargement des données :", error);
+      return null;
+    }
   },
 };
 
 export const DataProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
+
   const getData = useCallback(async () => {
     try {
-      setData(await api.loadData());
+      const fetchedData = await api.loadData();
+      console.log("Données réellement chargées :", fetchedData);
+
+      if (!fetchedData) {
+        throw new Error("Les données sont nulles ou absentes !");
+      }
+
+      setData(fetchedData);
     } catch (err) {
+      console.error("Erreur de chargement des données :", err);
       setError(err);
     }
   }, []);
+
   useEffect(() => {
     if (data) return;
     getData();
-  });
-  
+  }, [data, getData]);
+
+  // Utilise useMemo pour éviter que le contexte ne change à chaque rendu
+  const contextValue = useMemo(() => ({ data, error }), [data, error]);
+
   return (
-    <DataContext.Provider
-      // eslint-disable-next-line react/jsx-no-constructed-context-values
-      value={{
-        data,
-        error,
-      }}
-    >
+    <DataContext.Provider value={contextValue}>
       {children}
     </DataContext.Provider>
   );
@@ -46,7 +66,7 @@ export const DataProvider = ({ children }) => {
 
 DataProvider.propTypes = {
   children: PropTypes.node.isRequired,
-}
+};
 
 export const useData = () => useContext(DataContext);
 
