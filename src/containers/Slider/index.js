@@ -12,19 +12,29 @@ const Slider = () => {
     (evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)
   );
 
+  // Générer une ID unique si event.id est manquant
+  const eventByDateDesc = byDateDesc.map((event, idx) => ({
+    ...event,
+    id: event.id || `temp-id-${idx}-${new Date(event.date).getTime()}`
+  }));
+  console.log("Liste des événements avec leurs IDs :", eventByDateDesc.map(evt => ({
+    titre: evt.title,
+    id: evt.id
+  })));
+  
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIndex((prevIndex) => (prevIndex < byDateDesc.length - 1 ? prevIndex + 1 : 0));
+      setIndex((prevIndex) => (prevIndex < eventByDateDesc.length - 1 ? prevIndex + 1 : 0));
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [index, byDateDesc.length]);
+  }, [index, eventByDateDesc.length]);
 
   return (
     <div className="SlideCardList">
-      {byDateDesc.map((event, idx) => (
+      {eventByDateDesc.map((event, idx) => (
         <div
-          key={event.id} // Utilisation de `event.id` comme clé unique
+          key={event.id} // Utilisation d'une ID unique
           className={`SlideCard SlideCard--${index === idx ? "display" : "hide"}`}
         >
           <img src={event.cover} alt="forum" />
@@ -38,15 +48,15 @@ const Slider = () => {
         </div>
       ))}
 
-      {/* Pagination avec une clé unique (event.id) */}
+      {/* Pagination avec une clé unique */}
       <div className="SlideCard__paginationContainer">
         <div className="SlideCard__pagination">
-          {byDateDesc.map((event, idx) => (
+          {eventByDateDesc.map((event, idx) => (
             <input
-              key={`radio-${event.id}`} // 
+              key={`radio-${event.id}`} //  une ID unique 
               type="radio"
               name="radio-button"
-              checked={index === idx} 
+              checked={index === idx}
               readOnly
             />
           ))}
