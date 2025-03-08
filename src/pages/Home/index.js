@@ -14,13 +14,8 @@ import { useData } from "../../contexts/DataContext";
 
 
 const Page = () => {
-  const { data } = useData();
-const events = data?.events || [];
-  // Récupére le dernier événement effectué
-  const lastEvent = events
-    ?.filter(event => new Date(event.date) <= new Date()) // Filtre les événements passés
-    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Trie du plus récent au plus ancien
-    [0]; // Prendre le dernier
+  // Utilisation de lastEvent pour obtenir le dernier événement effectué
+  const { lastEvent } = useData();
 
   return (
     <>

@@ -54,8 +54,24 @@ export const DataProvider = ({ children }) => {
     getData();
   }, [data, getData]);
 
+   // Calcul de byDateDesc (événements triés par date décroissante)
+   const byDateDesc = useMemo(() => 
+    [...(data?.focus || [])].sort((evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)), 
+  [data]);
+
+  // Récupération du dernier événement effectué
+  const events = useMemo(() => data?.events || [], [data]);
+
+  const lastEvent = useMemo(() => 
+    events
+      ?.filter(event => new Date(event.date) <= new Date()) // Filtre les événements passés
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // Trie du plus récent au plus ancien
+      [0], 
+  [events]);
+  
+
   // Utilise useMemo pour éviter que le contexte ne change à chaque rendu
-  const contextValue = useMemo(() => ({ data, error }), [data, error]);
+  const contextValue = useMemo(() => ({ data, error, byDateDesc, lastEvent }), [data, error, byDateDesc, lastEvent]);
 
   return (
     <DataContext.Provider value={contextValue}>

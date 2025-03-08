@@ -4,13 +4,10 @@ import { getMonth } from "../../helpers/Date";
 import "./style.scss";
 
 const Slider = () => {
-  const { data } = useData();
   const [index, setIndex] = useState(0);
 
-  // Tri des événements en ordre décroissant (du plus récent au plus ancien)
-  const byDateDesc = [...(data?.focus || [])].sort(
-    (evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)
-  );
+  // Utilisation de byDateDesc pour obtenir les événements triés par date décroissante
+  const { byDateDesc } = useData();
 
   // Générer une ID unique si event.id est manquant
   const eventByDateDesc = byDateDesc.map((event, idx) => ({
